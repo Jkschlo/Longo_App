@@ -10,7 +10,9 @@ const Profile = () => {
       {/* Top Logo Box */}
       <View style={styles.topBox}>
         <Image
-          source={{ uri: "https://github.com/Jkschlo/Longo_App/blob/main/Longo Logo.png?raw=true" }}
+          source={{
+            uri: "https://github.com/Jkschlo/Longo_App/blob/main/Longo Logo.png?raw=true",
+          }}
           style={styles.logo}
           resizeMode="contain"
         />
@@ -22,32 +24,49 @@ const Profile = () => {
       {/* Circular Profile Picture */}
       <View style={styles.profilePicContainer}>
         <Image
-          source={{ uri: "https://github.com/Jkschlo/Longo_App/blob/main/Joe.JPG?raw=true" }}
+          source={{
+            uri: "https://github.com/Jkschlo/Longo_App/blob/main/Joe.JPG?raw=true",
+          }}
           style={styles.profilePic}
         />
       </View>
 
       {/* Bottom Nav */}
       <View style={styles.bottomNav}>
-        <TouchableOpacity style={styles.navItem} onPress={() => router.push("/")}>
+        <TouchableOpacity
+          style={styles.navItem}
+          onPress={() => router.push("/")}
+        >
           <Image
-            source={{ uri: "https://github.com/Jkschlo/Longo_App/blob/main/home.JPG?raw=true" }}
+            source={{
+              uri: "https://github.com/Jkschlo/Longo_App/blob/main/home.JPG?raw=true",
+            }}
             style={styles.navIcon}
           />
           <Text style={styles.navText}>Home</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.navItem} onPress={() => router.push("/Training")}>
+        <TouchableOpacity
+          style={styles.navItem}
+          onPress={() => router.push("/training")}
+        >
           <Image
-            source={{ uri: "https://github.com/Jkschlo/Longo_App/blob/main/training.JPG?raw=true" }}
+            source={{
+              uri: "https://github.com/Jkschlo/Longo_App/blob/main/training.JPG?raw=true",
+            }}
             style={styles.navIcon}
           />
           <Text style={styles.navText}>Training</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.navItem} onPress={() => router.push("/Profile")}>
+        <TouchableOpacity
+          style={styles.navItem}
+          onPress={() => router.push("/profile")}
+        >
           <Image
-            source={{ uri: "https://github.com/Jkschlo/Longo_App/blob/main/profile.JPG?raw=true" }}
+            source={{
+              uri: "https://github.com/Jkschlo/Longo_App/blob/main/profile.JPG?raw=true",
+            }}
             style={styles.navIcon}
           />
           <Text style={styles.navText}>Profile</Text>
@@ -61,12 +80,48 @@ export default Profile;
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#093075" },
-  topBox: { backgroundColor: "#fff", alignItems: "center", paddingVertical: 10 },
-  logo: { width: 180, height: 60 },
-  header: { color: "#fff", fontWeight: "bold", fontSize: 25, textAlign: "center", marginVertical: 15 },
+  topBox: {
+    backgroundColor: "#fff",
+    alignItems: "center",
+    paddingVertical: 10,
+  },
+  logoBar: {
+    height: 64,
+    backgroundColor: "#fff",
+    borderBottomWidth: 1,
+    borderBottomColor: "#eee",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  logo: { width: 140, height: 40 },
+  header: {
+    color: "#fff",
+    fontWeight: "bold",
+    fontSize: 25,
+    textAlign: "center",
+    marginVertical: 15,
+  },
   profilePicContainer: { alignItems: "center", marginVertical: 20 },
-  profilePic: { width: 120, height: 120, borderRadius: 60, borderWidth: 2, borderColor: "#fff" },
-  bottomNav: { position: "absolute", bottom: 0, left: 0, right: 0, height: 70, backgroundColor: "#fff", flexDirection: "row", justifyContent: "space-around", alignItems: "center", borderTopWidth: 1, borderTopColor: "#ddd" },
+  profilePic: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    borderWidth: 2,
+    borderColor: "#fff",
+  },
+  bottomNav: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: 70,
+    backgroundColor: "#fff",
+    flexDirection: "row",
+    justifyContent: "space-around",
+    alignItems: "center",
+    borderTopWidth: 1,
+    borderTopColor: "#ddd",
+  },
   navItem: { alignItems: "center" },
   navIcon: { width: 24, height: 24, marginBottom: 4 },
   navText: { fontSize: 12, fontWeight: "600" },

@@ -75,7 +75,7 @@ const SUBMODULES = [
   },
 ];
 
-export default function DuctCleaning() {
+export default function TruckMaintenance() {
   const router = useRouter();
 
   const renderItem = ({ item }) => {
@@ -116,7 +116,7 @@ export default function DuctCleaning() {
         <Pressable onPress={() => router.push("/training")} hitSlop={12}>
           <Text style={styles.backText}>← Back</Text>
         </Pressable>
-        <Text style={styles.title}>Duct Cleaning</Text>
+        <Text style={styles.title}>Truck Maintenance</Text>
         <View style={{ width: 60 }} />
       </View>
 

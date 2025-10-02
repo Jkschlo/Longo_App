@@ -113,7 +113,7 @@ export default function FloorCleaning() {
 
       {/* Header with back arrow */}
       <View style={styles.headerRow}>
-        <Pressable onPress={() => router.push("/Training")} hitSlop={12}>
+        <Pressable onPress={() => router.push("/training")} hitSlop={12}>
           <Text style={styles.backText}>← Back</Text>
         </Pressable>
         <Text style={styles.title}>Floor Cleaning</Text>
