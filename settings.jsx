@@ -1,17 +1,17 @@
-// app/profile.jsx
+// app/settings.jsx
 import React from "react";
 import {
   View,
   Text,
-  Image,
   StyleSheet,
+  Image,
   TouchableOpacity,
   ScrollView,
   Pressable,
 } from "react-native";
 import { useRouter, usePathname } from "expo-router";
 
-export default function Profile() {
+export default function Settings() {
   const router = useRouter();
   const pathname = usePathname();
 
@@ -28,7 +28,7 @@ export default function Profile() {
 
   return (
     <View style={styles.container}>
-      {/* Top Logo Bar */}
+    {/* Top Logo Bar — uniform with Profile */}
       <View style={styles.logoBar}>
         <Image
           source={{
@@ -39,45 +39,36 @@ export default function Profile() {
         />
       </View>
 
-      {/* Header under logo: spacer (left), (optional title), cog (right) */}
-      <View style={styles.headerRow}>
-        <View style={{ width: 60 }} />
-        {/* <Text style={styles.title}>Profile</Text>  // add back if you want a centered title */}
-        <Pressable onPress={safePush("/settings")} hitSlop={12}>
-          <Text style={styles.cogIcon}>⚙️</Text>
-        </Pressable>
-      </View>
+      <ScrollView contentContainerStyle={{ paddingBottom: 120 }}>
+        {/* Header under logo: Back (left), Title (center), spacer (right) */}
+        <View style={styles.headerRow}>
+          <Pressable onPress={safePush("/profile")} hitSlop={12}>
+            <Text style={styles.backText}>← Back</Text>
+          </Pressable>
 
-      {/* Blue content */}
-      <ScrollView contentContainerStyle={{ paddingBottom: 100 }}>
-        {/* Avatar + Name Block */}
-        <View style={styles.centerBlock}>
-          <View style={styles.avatarCircle}>
-            <Image
-              source={{
-                uri: "https://raw.githubusercontent.com/Jkschlo/Longo_App/main/Joe.JPG",
-              }}
-              style={styles.avatarImg}
-              resizeMode="cover"
-            />
-          </View>
-          <Text style={styles.name}>Joe Longo</Text>
-          <Text style={styles.role}>Technician</Text>
+          <Text style={styles.title}>Settings</Text>
+
+          <View style={{ width: 60 }} />
         </View>
 
-        {/* Menu list (no Settings row) */}
-        <View style={styles.cardList}>
-          <Row label="Google Reviews" onPress={safePush("/reviews")} />
+        {/* List (no Settings row here) */}
+        <View style={styles.listWrap}>
+          <Row label="Change Password" onPress={safePush("/changePw")} />
           <View style={styles.divider} />
-          <Row label="Badges" onPress={safePush("/badges")} />
+          <Row label="Privacy Policy" onPress={safePush("/privacy")} />
           <View style={styles.divider} />
-          <Row label="Company Handbook" onPress={safePush("/handbook")} />
+          <Row label="About" onPress={safePush("/about")} />
           <View style={styles.divider} />
-          <Row label="FAQs" onPress={safePush("/faqs")} />
+          <Row
+            label="Logout"
+            onPress={() => {
+              router.replace("/login");
+            }}
+          />
         </View>
       </ScrollView>
 
-      {/* Bottom Nav (image icons) */}
+      {/* Bottom Nav — uniform with Profile */}
       <View style={styles.bottomNav}>
         <TouchableOpacity style={styles.navItem} onPress={safePush("/quizzes")}>
           <Image
@@ -114,10 +105,10 @@ export default function Profile() {
 }
 
 const styles = StyleSheet.create({
-  // Page background
+  // Page background (uniform)
   container: { flex: 1, backgroundColor: "#093075" },
 
-  // Top logo bar (uniform)
+  // Top Logo Bar (match Profile)
   logoBar: {
     height: 90,
     backgroundColor: "#fff",
@@ -129,7 +120,7 @@ const styles = StyleSheet.create({
   },
   logo: { width: 140, height: 40 },
 
-  // Header row with (optional) title & cog
+  // Header under logo (Floor Cleaning style back)
   headerRow: {
     flexDirection: "row",
     alignItems: "center",
@@ -137,6 +128,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     justifyContent: "space-between",
   },
+  backText: { fontSize: 16, fontWeight: "700", width: 60, color: "#fff" },
   title: {
     fontSize: 20,
     fontWeight: "800",
@@ -144,43 +136,9 @@ const styles = StyleSheet.create({
     flex: 1,
     color: "#fff",
   },
-  cogIcon: {
-    fontSize: 25,
-    color: "#fff",
-    fontWeight: "700",
-    width: 60,
-    textAlign: "right",
-  },
 
-  // Profile content
-  centerBlock: { alignItems: "center", marginTop: 6, marginBottom: 10 },
-  avatarCircle: {
-    width: 92,
-    height: 92,
-    borderRadius: 46,
-    backgroundColor: "#0f4b95",
-    borderWidth: 2,
-    borderColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: 10,
-    padding: 2,          // small padding so the image sits inside the white border
-    overflow: "hidden",  // ensures the image clips to the circle
-  },
-  avatarImg: {
-    width: "100%",
-    height: "100%",
-    borderRadius: 46,
-  },
-  name: { color: "#fff", fontSize: 22, fontWeight: "800" },
-  role: { color: "#BFD0EA", marginTop: 2, fontWeight: "700" },
-
-  cardList: {
-    backgroundColor: "transparent",
-    marginTop: 8,
-    marginHorizontal: 12,
-    borderRadius: 12,
-  },
+  // List (uniform with Profile)
+  listWrap: { marginHorizontal: 14, marginTop: 10, borderRadius: 14 },
   row: {
     paddingHorizontal: 14,
     paddingVertical: 16,

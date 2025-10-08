@@ -1,5 +1,12 @@
 import React from "react";
-import { View, Text, Pressable, Image, StyleSheet, FlatList } from "react-native";
+import {
+  View,
+  Text,
+  Pressable,
+  Image,
+  StyleSheet,
+  FlatList,
+} from "react-native";
 import { useRouter } from "expo-router";
 
 const SUBMODULES = [
@@ -83,7 +90,11 @@ export default function Safety() {
     return (
       <Pressable style={styles.card} onPress={() => router.push(item.route)}>
         {/* Image shows entire picture (contain) and is a bit shorter */}
-        <Image source={{ uri: item.img }} style={styles.cardImg} resizeMode="contain" />
+        <Image
+          source={{ uri: item.img }}
+          style={styles.cardImg}
+          resizeMode="contain"
+        />
 
         <Text style={styles.cardLabel}>{item.label}</Text>
 
@@ -138,14 +149,24 @@ const CARD_W = "48%";
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#093075" }, // dark blue background
   logoBar: {
-    height: 64,
+    height: 90,
     backgroundColor: "#fff",
-    borderBottomWidth: 1,
+    borderBottomWidth: 0,
     borderBottomColor: "#eee",
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: "flex-end", // push content to the bottom
+    alignItems: "center", // center horizontally
+    paddingBottom: 8, // tweak spacing from bottom as needed
   },
   logo: { width: 140, height: 40 },
+
+  header: {
+    color: "#fff",
+    fontWeight: "800",
+    fontSize: 22,
+    textAlign: "center",
+    marginTop: 12,
+    marginBottom: 4,
+  },
 
   headerRow: {
     flexDirection: "row",
@@ -155,7 +176,13 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   backText: { fontSize: 16, fontWeight: "700", width: 60, color: "#fff" },
-  title: { fontSize: 20, fontWeight: "800", textAlign: "center", flex: 1, color: "#fff" },
+  title: {
+    fontSize: 20,
+    fontWeight: "800",
+    textAlign: "center",
+    flex: 1,
+    color: "#fff",
+  },
 
   card: {
     width: CARD_W,
@@ -167,9 +194,20 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   // ↓ Shorter height + 'contain' in Image so full picture fits
-  cardImg: { width: "100%", height: 90, borderRadius: 8, marginBottom: 8, backgroundColor: "#fff" },
+  cardImg: {
+    width: "100%",
+    height: 90,
+    borderRadius: 8,
+    marginBottom: 8,
+    backgroundColor: "#fff",
+  },
 
-  cardLabel: { fontSize: 14, textAlign: "center", fontWeight: "700", marginBottom: 8 },
+  cardLabel: {
+    fontSize: 14,
+    textAlign: "center",
+    fontWeight: "700",
+    marginBottom: 8,
+  },
 
   // Row to place bar and percent side by side
   progressRow: { flexDirection: "row", alignItems: "center", gap: 8 },
@@ -182,5 +220,11 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   progressFill: { height: "100%", backgroundColor: "#2f80ed" },
-  percentText: { fontSize: 12, fontWeight: "700", color: "#000", width: 38, textAlign: "right" },
+  percentText: {
+    fontSize: 12,
+    fontWeight: "700",
+    color: "#000",
+    width: 38,
+    textAlign: "right",
+  },
 });

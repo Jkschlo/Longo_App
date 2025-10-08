@@ -1,77 +1,57 @@
 import React from "react";
-import { View, Text, Pressable, Image, StyleSheet, FlatList } from "react-native";
+import {
+  View,
+  Text,
+  Pressable,
+  Image,
+  StyleSheet,
+  FlatList,
+  TouchableOpacity,
+} from "react-native";
 import { useRouter } from "expo-router";
 
 const SUBMODULES = [
   {
-    key: "residential",
-    label: "Residential",
-    route: "/residential",
-    img: "https://raw.githubusercontent.com/Jkschlo/Longo_App/main/residential.JPG",
-    progress: 40, // ← update these as you complete content
+    key: "duct-cleaning-process",
+    label: "Basic Process",
+    route: "/ductCleaningProcess",
+    img: "https://raw.githubusercontent.com/Jkschlo/Longo_App/main/duct.JPG",
+    progress: 40,
   },
   {
-    key: "commercial",
-    label: "Commercial",
-    route: "/commercial",
-    img: "https://raw.githubusercontent.com/Jkschlo/Longo_App/main/commercial.JPG",
+    key: "dryer-exhaust",
+    label: "Dryer Exhaust",
+    route: "/dryerExhaust",
+    img: "https://raw.githubusercontent.com/Jkschlo/Longo_App/main/dryer.JPG",
     progress: 70,
   },
   {
-    key: "rugs",
-    label: "Area Rugs",
-    route: "/areaRugs",
-    img: "https://raw.githubusercontent.com/Jkschlo/Longo_App/main/arearug.JPG",
+    key: "kitchen-exhaust",
+    label: "Kitchen Exhaust",
+    route: "/kitchenExhaust",
+    img: "https://raw.githubusercontent.com/Jkschlo/Longo_App/main/kitchen.JPG",
     progress: 20,
   },
   {
-    key: "stairs",
-    label: "Stairs",
-    route: "/stairs",
-    img: "https://raw.githubusercontent.com/Jkschlo/Longo_App/main/stairs.JPG",
+    key: "bathroom-exhaust",
+    label: "Bathroom Exhaust",
+    route: "/bathroomExhaust",
+    img: "https://raw.githubusercontent.com/Jkschlo/Longo_App/main/bathroom.JPG",
     progress: 55,
   },
   {
-    key: "upholstery",
-    label: "Upholstery",
-    route: "/upholstery",
-    img: "https://raw.githubusercontent.com/Jkschlo/Longo_App/main/upholstery.JPG",
+    key: "additional-services",
+    label: "Additional Services",
+    route: "/additionalServices",
+    img: "https://raw.githubusercontent.com/Jkschlo/Longo_App/main/additional.JPG",
     progress: 10,
   },
   {
-    key: "ceramic",
-    label: "Ceramic Flooring",
-    route: "/ceramic",
-    img: "https://raw.githubusercontent.com/Jkschlo/Longo_App/main/ceramic.JPG",
+    key: "equipment",
+    label: "Equipment",
+    route: "/equipment",
+    img: "https://raw.githubusercontent.com/Jkschlo/Longo_App/main/dehu.JPG",
     progress: 0,
-  },
-  {
-    key: "wood",
-    label: "Wood Flooring",
-    route: "/wood",
-    img: "https://raw.githubusercontent.com/Jkschlo/Longo_App/main/wood.JPG",
-    progress: 15,
-  },
-  {
-    key: "stripwax",
-    label: "Strip & Wax",
-    route: "/stripWax",
-    img: "https://raw.githubusercontent.com/Jkschlo/Longo_App/main/strip.JPG",
-    progress: 35,
-  },
-  {
-    key: "vinyl",
-    label: "Vinyl",
-    route: "/vinyl",
-    img: "https://raw.githubusercontent.com/Jkschlo/Longo_App/main/vinyl.JPG",
-    progress: 80,
-  },
-  {
-    key: "additional",
-    label: "Additional Services",
-    route: "/additional",
-    img: "https://raw.githubusercontent.com/Jkschlo/Longo_App/main/additional.JPG",
-    progress: 5,
   },
 ];
 
@@ -79,15 +59,15 @@ export default function DuctCleaning() {
   const router = useRouter();
 
   const renderItem = ({ item }) => {
-    const pct = Math.max(0, Math.min(100, item.progress ?? 0)); // clamp 0-100
+    const pct = Math.max(0, Math.min(100, item.progress ?? 0));
     return (
       <Pressable style={styles.card} onPress={() => router.push(item.route)}>
-        {/* Image shows entire picture (contain) and is a bit shorter */}
-        <Image source={{ uri: item.img }} style={styles.cardImg} resizeMode="contain" />
-
+        <Image
+          source={{ uri: item.img }}
+          style={styles.cardImg}
+          resizeMode="contain"
+        />
         <Text style={styles.cardLabel}>{item.label}</Text>
-
-        {/* Progress row: bar + percentage */}
         <View style={styles.progressRow}>
           <View style={styles.progressTrack}>
             <View style={[styles.progressFill, { width: `${pct}%` }]} />
@@ -104,7 +84,7 @@ export default function DuctCleaning() {
       <View style={styles.logoBar}>
         <Image
           source={{
-            uri: "https://raw.githubusercontent.com/Jkschlo/Longo_App/main/Longo%20Logo.png",
+            uri: "https://raw.githubusercontent.com/Jkschlo/Longo_App/main/Affordable%20Duct%20cleaning%20logo.png",
           }}
           style={styles.logo}
           resizeMode="contain"
@@ -127,8 +107,50 @@ export default function DuctCleaning() {
         keyExtractor={(i) => i.key}
         numColumns={2}
         columnWrapperStyle={{ gap: 12, paddingHorizontal: 12 }}
-        contentContainerStyle={{ paddingBottom: 24, paddingTop: 12, gap: 12 }}
+        contentContainerStyle={{ paddingBottom: 100, paddingTop: 12, gap: 12 }}
       />
+
+      {/* Bottom Nav (same as Training) */}
+      <View style={styles.bottomNav}>
+        <TouchableOpacity
+          style={styles.navItem}
+          onPress={() => router.push("/quizzes")}
+        >
+          <Image
+            source={{
+              uri: "https://raw.githubusercontent.com/Jkschlo/Longo_App/main/quizzes.png",
+            }}
+            style={styles.navIcon}
+          />
+          <Text style={styles.navText}>Quizzes</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.navItem}
+          onPress={() => router.push("/training")}
+        >
+          <Image
+            source={{
+              uri: "https://github.com/Jkschlo/Longo_App/blob/main/training.JPG?raw=true",
+            }}
+            style={styles.navIcon}
+          />
+          <Text style={styles.navText}>Training</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.navItem}
+          onPress={() => router.push("/profile")}
+        >
+          <Image
+            source={{
+              uri: "https://github.com/Jkschlo/Longo_App/blob/main/profile.JPG?raw=true",
+            }}
+            style={styles.navIcon}
+          />
+          <Text style={styles.navText}>Profile</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
@@ -136,16 +158,26 @@ export default function DuctCleaning() {
 const CARD_W = "48%";
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#093075" }, // dark blue background
+  container: { flex: 1, backgroundColor: "#FF8F35" },
   logoBar: {
-    height: 64,
+    height: 90,
     backgroundColor: "#fff",
-    borderBottomWidth: 1,
+    borderBottomWidth: 0,
     borderBottomColor: "#eee",
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: "flex-end", // push content to the bottom
+    alignItems: "center", // center horizontally
+    paddingBottom: 8, // tweak spacing from bottom as needed
   },
   logo: { width: 140, height: 40 },
+
+  header: {
+    color: "#fff",
+    fontWeight: "800",
+    fontSize: 22,
+    textAlign: "center",
+    marginTop: 12,
+    marginBottom: 4,
+  },
 
   headerRow: {
     flexDirection: "row",
@@ -155,7 +187,13 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   backText: { fontSize: 16, fontWeight: "700", width: 60, color: "#fff" },
-  title: { fontSize: 20, fontWeight: "800", textAlign: "center", flex: 1, color: "#fff" },
+  title: {
+    fontSize: 20,
+    fontWeight: "800",
+    textAlign: "center",
+    flex: 1,
+    color: "#fff",
+  },
 
   card: {
     width: CARD_W,
@@ -166,14 +204,21 @@ const styles = StyleSheet.create({
     padding: 10,
     overflow: "hidden",
   },
-  // ↓ Shorter height + 'contain' in Image so full picture fits
-  cardImg: { width: "100%", height: 90, borderRadius: 8, marginBottom: 8, backgroundColor: "#fff" },
-
-  cardLabel: { fontSize: 14, textAlign: "center", fontWeight: "700", marginBottom: 8 },
-
-  // Row to place bar and percent side by side
+  cardImg: {
+    width: "75%",
+    height: 90,
+    borderRadius: 8,
+    alignSelf: "center",
+    marginBottom: 8,
+    backgroundColor: "#fff",
+  },
+  cardLabel: {
+    fontSize: 14,
+    textAlign: "center",
+    fontWeight: "700",
+    marginBottom: 8,
+  },
   progressRow: { flexDirection: "row", alignItems: "center", gap: 8 },
-
   progressTrack: {
     flex: 1,
     height: 8,
@@ -182,5 +227,28 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   progressFill: { height: "100%", backgroundColor: "#2f80ed" },
-  percentText: { fontSize: 12, fontWeight: "700", color: "#000", width: 38, textAlign: "right" },
+  percentText: {
+    fontSize: 12,
+    fontWeight: "700",
+    color: "#000",
+    width: 38,
+    textAlign: "right",
+  },
+
+  bottomNav: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: 90,
+    backgroundColor: "#fff",
+    flexDirection: "row",
+    justifyContent: "space-around",
+    alignItems: "center",
+    borderTopWidth: 1,
+    borderTopColor: "#ddd",
+  },
+  navItem: { alignItems: "center" },
+  navIcon: { width: 24, height: 24, marginBottom: 4 },
+  navText: { fontSize: 12, fontWeight: "600" },
 });

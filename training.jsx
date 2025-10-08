@@ -46,14 +46,15 @@ const TRAINING_MODULES = [
     image:
       "https://raw.githubusercontent.com/Jkschlo/Longo_App/main/safetyvest.JPG",
     progress: 0,
-    route: "/safety",
+    route: "/placeholder",
   },
   {
     key: "equip",
     label: "Equipment",
-    image: "https://raw.githubusercontent.com/Jkschlo/Longo_App/main/Fan.JPG",
+    image:
+      "https://raw.githubusercontent.com/Jkschlo/Longo_App/main/airmover.JPG",
     progress: 75,
-    route: "/equipment",
+    route: "/placeholder",
   },
 ];
 
@@ -110,15 +111,15 @@ export default function Training() {
       <View style={styles.bottomNav}>
         <TouchableOpacity
           style={styles.navItem}
-          onPress={() => router.push("/")}
+          onPress={() => router.push("/quizzes")}
         >
           <Image
             source={{
-              uri: "https://github.com/Jkschlo/Longo_App/blob/main/home.JPG?raw=true",
+              uri: "https://raw.githubusercontent.com/Jkschlo/Longo_App/main/quizzes.png",
             }}
             style={styles.navIcon}
           />
-          <Text style={styles.navText}>Home</Text>
+          <Text style={styles.navText}>Quizzes</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -156,12 +157,13 @@ const CARD_W = "48%";
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#093075" },
   logoBar: {
-    height: 64,
+    height: 90,
     backgroundColor: "#fff",
-    borderBottomWidth: 1,
+    borderBottomWidth: 0,
     borderBottomColor: "#eee",
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: "flex-end", // push content to the bottom
+    alignItems: "center", // center horizontally
+    paddingBottom: 8, // tweak spacing from bottom as needed
   },
   logo: { width: 140, height: 40 },
 
@@ -183,13 +185,20 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   cardImg: {
-    width: "100%",
+    width: "75%",
     height: 90,
+    alignSelf: "center",
     borderRadius: 8,
     marginBottom: 8,
     backgroundColor: "#fff",
   },
-  cardLabel: { fontSize: 14, fontWeight: "700", marginBottom: 8 },
+  cardLabel: {
+    align: "center",
+    textAlign: "center",
+    fontSize: 14,
+    fontWeight: "700",
+    marginBottom: 8,
+  },
 
   progressRow: { flexDirection: "row", alignItems: "center", gap: 8 },
   progressTrack: {
@@ -213,7 +222,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    height: 70,
+    height: 90,
     backgroundColor: "#fff",
     flexDirection: "row",
     justifyContent: "space-around",
