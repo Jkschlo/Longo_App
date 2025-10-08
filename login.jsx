@@ -1,5 +1,5 @@
 // app/login.jsx
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   View,
   Text,
@@ -14,19 +14,100 @@ import {
 } from "react-native";
 import { useRouter } from "expo-router";
 
+// ---- colors used across the page ----
 const COLORS = {
-  navy: "#0B3B75",
-  lightBlue: "#63B3E4",
-  input: "#2E4E86",
-  white: "#FFFFFF",
-  bg: "#F3F6FA",
-  grayText: "#DCE6F5",
+  white: "#ffffff",
+  navy: "#0e3a6f",
+  deepNavy: "#0A2C57",
+  lightBlue: "#6EC1E4",
+  bg: "#ffffff",
+  error: "#ffb3b3",
 };
 
+// ---- shared shell wrapper: top logo / centered area / bottom logo ----
+const AuthShell = ({ children }) => {
+  return (
+    <View style={{ flex: 1, backgroundColor: COLORS.bg }}>
+      {/* Top logo box */}
+      <View style={shellStyles.topBox}>
+        <Image
+          source={{
+            uri: "https://github.com/Jkschlo/Longo_App/blob/main/Longo%20Logo.png?raw=true",
+          }}
+          style={shellStyles.topLogo}
+          resizeMode="contain"
+        />
+      </View>
+
+      {/* Centered content */}
+      <View style={shellStyles.centerArea}>{children}</View>
+
+      {/* Bottom logo box */}
+      <View style={shellStyles.bottomBox}>
+        <Image
+          source={{
+            uri: "https://raw.githubusercontent.com/Jkschlo/Longo_App/main/Affordable%20Duct%20cleaning%20logo.png",
+          }}
+          style={shellStyles.bottomLogo}
+          resizeMode="contain"
+        />
+      </View>
+    </View>
+  );
+};
+
+const shellStyles = StyleSheet.create({
+  topBox: {
+    backgroundColor: COLORS.white,
+    paddingTop: 80,
+    paddingBottom: 12,
+    alignItems: "center",
+    borderBottomLeftRadius: 18,
+    borderBottomRightRadius: 18,
+    shadowColor: "#000",
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 3,
+  },
+  topLogo: { width: 300, height: 75 },
+  centerArea: {
+    flex: 1,
+    justifyContent: "center",
+    paddingHorizontal: 16,
+  },
+  bottomBox: {
+    paddingVertical: 70,
+    alignItems: "center",
+    paddingBottom: 100,
+  },
+  bottomLogo: { width: 300, height: 75 },
+});
+
+// ---- simple validators ----
+const nameIsValid = (name) => {
+  // At least two words of letters with space/’/-
+  const re = /^[A-Za-z]+(?:[ '\-][A-Za-z]+)+$/;
+  return re.test(name.trim());
+};
+const passwordIsValid = (pwd) => {
+  if (!pwd || pwd.length < 7) return false;
+  // must include at least one special character
+  const hasSpecial = /[!@#$%^&*(),.?":{}|<>_\-\\[\];'`~+/=]/.test(pwd);
+  return hasSpecial;
+};
+
+// ---- Login screen ----
 export default function Login() {
   const router = useRouter();
+
+  // slide + fade animation for the card
   const slide = useRef(new Animated.Value(80)).current;
   const fade = useRef(new Animated.Value(0)).current;
+
+  // controlled inputs + errors
+  const [name, setName] = useState("");
+  const [password, setPassword] = useState("");
+  const [errors, setErrors] = useState({ name: "", password: "" });
 
   useEffect(() => {
     Animated.parallel([
@@ -43,36 +124,31 @@ export default function Login() {
     ]).start();
   }, []);
 
+  const validateAndGo = () => {
+    const next = { name: "", password: "" };
+    if (!nameIsValid(name)) next.name = "Enter your full name (first and last).";
+    if (!passwordIsValid(password))
+      next.password = "Password must be 7+ chars and include a special character.";
+    setErrors(next);
+
+    const ok = !next.name && !next.password;
+    if (ok) router.push("/training");
+  };
+
   return (
     <KeyboardAvoidingView
       behavior={Platform.select({ ios: "padding", android: undefined })}
       style={{ flex: 1, backgroundColor: COLORS.bg }}
     >
       <ScrollView bounces={false} contentContainerStyle={{ flexGrow: 1 }}>
-        <View style={styles.container}>
-          {/* Top white logo block */}
-          <View style={styles.topBox}>
-            <Image
-              source={{
-                uri: "https://raw.githubusercontent.com/Jkschlo/Longo_App/main/Longo%20Logo.png",
-              }}
-              style={styles.longoLogo}
-              resizeMode="contain"
-            />
-            <Image
-              source={{
-                uri: "https://raw.githubusercontent.com/Jkschlo/Longo_App/main/Affordable%20Duct%20cleaning%20logo.png",
-              }}
-              style={styles.longoLogo}
-              resizeMode="contain"
-            />
-          </View>
-
-          {/* Rounded blue card (animated) */}
+        <AuthShell>
           <Animated.View
             style={[
               styles.card,
-              { opacity: fade, transform: [{ translateY: slide }] },
+              {
+                opacity: fade,
+                transform: [{ translateY: slide }],
+              },
             ]}
           >
             <Text style={styles.title}>Login</Text>
@@ -80,23 +156,40 @@ export default function Login() {
 
             <Text style={styles.label}>NAME</Text>
             <TextInput
-              placeholder="Technician"
-              placeholderTextColor={COLORS.grayText}
+              placeholder=""
+              placeholderTextColor="#c8d3e1"
               style={styles.input}
+              value={name}
+              onChangeText={(t) => {
+                setName(t);
+                if (errors.name) setErrors((e) => ({ ...e, name: "" }));
+              }}
+              autoCapitalize="words"
+              returnKeyType="next"
             />
+            {!!errors.name && <Text style={styles.errorText}>{errors.name}</Text>}
 
             <Text style={[styles.label, { marginTop: 12 }]}>PASSWORD</Text>
             <TextInput
-              placeholder="******"
-              placeholderTextColor={COLORS.grayText}
+              placeholder=""
+              placeholderTextColor="#c8d3e1"
               secureTextEntry
               style={styles.input}
+              value={password}
+              onChangeText={(t) => {
+                setPassword(t);
+                if (errors.password) setErrors((e) => ({ ...e, password: "" }));
+              }}
+              returnKeyType="done"
             />
+            {!!errors.password && (
+              <Text style={styles.errorText}>{errors.password}</Text>
+            )}
 
-            {/* Go to /training on press */}
             <TouchableOpacity
               style={styles.button}
-              onPress={() => router.replace("/training")}
+              onPress={validateAndGo}
+              activeOpacity={0.85}
             >
               <Text style={styles.buttonText}>Log In</Text>
             </TouchableOpacity>
@@ -104,48 +197,57 @@ export default function Login() {
             <TouchableOpacity onPress={() => router.push("/createLogin")}>
               <Text style={styles.link}>Create Account</Text>
             </TouchableOpacity>
+            <TouchableOpacity onPress={() => router.push("/training")}>
+              <Text style={styles.link}>Bypass</Text>
+            </TouchableOpacity>
           </Animated.View>
-        </View>
+        </AuthShell>
       </ScrollView>
     </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
-  topBox: {
-    backgroundColor: COLORS.white,
-    paddingTop: 28,
-    paddingBottom: 16,
-    alignItems: "center",
-    borderBottomLeftRadius: 18,
-    borderBottomRightRadius: 18,
-    shadowColor: "#000",
-    shadowOpacity: 0.08,
-    shadowRadius: 8,
-    elevation: 3,
-  },
-  longoLogo: { width: 220, height: 64, marginBottom: 4 },
-  adcLogo: { width: 200, height: 50, marginBottom: 6 },
-
   card: {
-    backgroundColor: COLORS.navy,
-    marginHorizontal: 14,
-    marginTop: 14,
-    borderRadius: 24,
-    padding: 18,
+    backgroundColor: COLORS.deepNavy,
+    borderRadius: 18,
+    padding: 20,
+    marginHorizontal: 2,
+    shadowColor: "#000",
+    shadowOpacity: 0.12,
+    shadowRadius: 12,
+    elevation: 4,
   },
-  title: { color: COLORS.white, fontSize: 26, fontWeight: "800", marginBottom: 4 },
-  subtitle: { color: "#C7D5EE", marginBottom: 16 },
-
-  label: { color: "#C7D5EE", fontSize: 12, fontWeight: "700", marginBottom: 6 },
-  input: {
-    backgroundColor: COLORS.input,
+  title: {
+    fontSize: 32,
+    fontWeight: "900",
     color: COLORS.white,
-    borderRadius: 14,
+    textAlign: "center",
+  },
+  subtitle: {
+    fontSize: 12,
+    color: "#cfe2ff",
+    textAlign: "center",
+    marginTop: 4,
+    marginBottom: 10,
+  },
+  label: {
+    color: "#cfe2ff",
+    fontSize: 12,
+    marginBottom: 6,
+    marginTop: 6,
+  },
+  input: {
+    backgroundColor: "#274a7e",
+    color: COLORS.white,
+    borderRadius: 12,
     paddingHorizontal: 14,
     paddingVertical: 12,
-    fontSize: 16,
+  },
+  errorText: {
+    color: COLORS.error,
+    fontSize: 12,
+    marginTop: 6,
   },
   button: {
     backgroundColor: COLORS.lightBlue,
