@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import {
   View,
   Text,
@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { useRouter } from "expo-router";
+import { useFocusEffect } from "@react-navigation/native";
 
 const SUBMODULES = [
   {
@@ -16,57 +17,71 @@ const SUBMODULES = [
     label: "Basic Process",
     route: "/ductCleaningProcess",
     img: "https://raw.githubusercontent.com/Jkschlo/Longo_App/main/duct.JPG",
-    progress: 40,
   },
   {
     key: "dryer-exhaust",
     label: "Dryer Exhaust",
     route: "/dryerExhaust",
     img: "https://raw.githubusercontent.com/Jkschlo/Longo_App/main/dryer.JPG",
-    progress: 70,
   },
   {
     key: "kitchen-exhaust",
     label: "Kitchen Exhaust",
     route: "/kitchenExhaust",
     img: "https://raw.githubusercontent.com/Jkschlo/Longo_App/main/kitchen.JPG",
-    progress: 20,
   },
   {
     key: "bathroom-exhaust",
     label: "Bathroom Exhaust",
     route: "/bathroomExhaust",
     img: "https://raw.githubusercontent.com/Jkschlo/Longo_App/main/bathroom.JPG",
-    progress: 55,
   },
   {
     key: "additional-services",
     label: "Additional Services",
     route: "/additionalServices",
     img: "https://raw.githubusercontent.com/Jkschlo/Longo_App/main/additional.JPG",
-    progress: 10,
   },
   {
     key: "equipment",
     label: "Equipment",
     route: "/equipment",
     img: "https://raw.githubusercontent.com/Jkschlo/Longo_App/main/dehu.JPG",
-    progress: 0,
   },
 ];
 
 export default function DuctCleaning() {
   const router = useRouter();
+  const [progressMap, setProgressMap] = useState({});
+
+  const keys = SUBMODULES.map((m) => m.key);
+
+  const loadProgress = useCallback(async () => {
+    try {
+      const map = await getProgressBulk(keys);
+      setProgressMap(map);
+    } catch {
+      const fallback = {};
+      keys.forEach((k) => (fallback[k] = { percent: 0, status: "not_started" }));
+      setProgressMap(fallback);
+    }
+  }, [keys]);
+
+  useEffect(() => {
+    loadProgress();
+  }, [loadProgress]);
+
+  useFocusEffect(
+    useCallback(() => {
+      loadProgress();
+    }, [loadProgress])
+  );
 
   const renderItem = ({ item }) => {
-    const pct = Math.max(0, Math.min(100, item.progress ?? 0));
+    const pct = Math.max(0, Math.min(100, progressMap[item.key]?.percent ?? 0));
     return (
       <Pressable style={styles.card} onPress={() => router.push(item.route)}>
-        <Image
-          source={{ uri: item.img }}
-          style={styles.cardImg}
-          resizeMode="contain"
-        />
+        <Image source={{ uri: item.img }} style={styles.cardImg} resizeMode="contain" />
         <Text style={styles.cardLabel}>{item.label}</Text>
         <View style={styles.progressRow}>
           <View style={styles.progressTrack}>
@@ -112,40 +127,25 @@ export default function DuctCleaning() {
 
       {/* Bottom Nav (same as Training) */}
       <View style={styles.bottomNav}>
-        <TouchableOpacity
-          style={styles.navItem}
-          onPress={() => router.push("/quizzes")}
-        >
+        <TouchableOpacity style={styles.navItem} onPress={() => router.push("/quizzes")}>
           <Image
-            source={{
-              uri: "https://raw.githubusercontent.com/Jkschlo/Longo_App/main/quizzes.png",
-            }}
+            source={{ uri: "https://raw.githubusercontent.com/Jkschlo/Longo_App/main/quizzes.png" }}
             style={styles.navIcon}
           />
           <Text style={styles.navText}>Quizzes</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity
-          style={styles.navItem}
-          onPress={() => router.push("/training")}
-        >
+        <TouchableOpacity style={styles.navItem} onPress={() => router.push("/training")}>
           <Image
-            source={{
-              uri: "https://github.com/Jkschlo/Longo_App/blob/main/training.JPG?raw=true",
-            }}
+            source={{ uri: "https://github.com/Jkschlo/Longo_App/blob/main/training.JPG?raw=true" }}
             style={styles.navIcon}
           />
           <Text style={styles.navText}>Training</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity
-          style={styles.navItem}
-          onPress={() => router.push("/profile")}
-        >
+        <TouchableOpacity style={styles.navItem} onPress={() => router.push("/profile")}>
           <Image
-            source={{
-              uri: "https://github.com/Jkschlo/Longo_App/blob/main/profile.JPG?raw=true",
-            }}
+            source={{ uri: "https://github.com/Jkschlo/Longo_App/blob/main/profile.JPG?raw=true" }}
             style={styles.navIcon}
           />
           <Text style={styles.navText}>Profile</Text>
@@ -164,12 +164,11 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     borderBottomWidth: 0,
     borderBottomColor: "#eee",
-    justifyContent: "flex-end", // push content to the bottom
-    alignItems: "center", // center horizontally
-    paddingBottom: 8, // tweak spacing from bottom as needed
+    justifyContent: "flex-end",
+    alignItems: "center",
+    paddingBottom: 8,
   },
   logo: { width: 140, height: 40 },
-
   header: {
     color: "#fff",
     fontWeight: "800",
@@ -178,7 +177,6 @@ const styles = StyleSheet.create({
     marginTop: 12,
     marginBottom: 4,
   },
-
   headerRow: {
     flexDirection: "row",
     alignItems: "center",
@@ -194,7 +192,6 @@ const styles = StyleSheet.create({
     flex: 1,
     color: "#fff",
   },
-
   card: {
     width: CARD_W,
     backgroundColor: "#fff",
@@ -212,29 +209,11 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     backgroundColor: "#fff",
   },
-  cardLabel: {
-    fontSize: 14,
-    textAlign: "center",
-    fontWeight: "700",
-    marginBottom: 8,
-  },
+  cardLabel: { fontSize: 14, textAlign: "center", fontWeight: "700", marginBottom: 8 },
   progressRow: { flexDirection: "row", alignItems: "center", gap: 8 },
-  progressTrack: {
-    flex: 1,
-    height: 8,
-    backgroundColor: "#e6e6e6",
-    borderRadius: 999,
-    overflow: "hidden",
-  },
+  progressTrack: { flex: 1, height: 8, backgroundColor: "#e6e6e6", borderRadius: 999, overflow: "hidden" },
   progressFill: { height: "100%", backgroundColor: "#2f80ed" },
-  percentText: {
-    fontSize: 12,
-    fontWeight: "700",
-    color: "#000",
-    width: 38,
-    textAlign: "right",
-  },
-
+  percentText: { fontSize: 12, fontWeight: "700", color: "#000", width: 38, textAlign: "right" },
   bottomNav: {
     position: "absolute",
     bottom: 0,

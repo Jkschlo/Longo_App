@@ -1,5 +1,5 @@
 // app/settings.jsx
-import React from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -8,27 +8,55 @@ import {
   TouchableOpacity,
   ScrollView,
   Pressable,
+  Alert,
 } from "react-native";
 import { useRouter, usePathname } from "expo-router";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { supabase } from "../lib/supabase";
 
 export default function Settings() {
   const router = useRouter();
   const pathname = usePathname();
+  const [busy, setBusy] = useState(false);
 
   const safePush = (href) => () => {
     if (pathname !== href) router.push(href);
   };
 
-  const Row = ({ label, onPress }) => (
-    <TouchableOpacity style={styles.row} onPress={onPress}>
-      <Text style={styles.rowText}>{label}</Text>
-      <Text style={styles.chev}>{">"}</Text>
+  const onLogout = async () => {
+    if (busy) return;
+    setBusy(true);
+    try {
+      // Optional: clear any locally-stashed data used during signup
+      await AsyncStorage.removeItem("@profileDraft");
+
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+
+      // Replace to prevent going "Back" into an authed screen
+      router.replace("/login");
+    } catch (e) {
+      Alert.alert("Logout failed", e?.message ?? "Please try again.");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const Row = ({ label, onPress, danger, disabled }) => (
+    <TouchableOpacity
+      style={[styles.row, disabled && { opacity: 0.6 }]}
+      onPress={onPress}
+      disabled={disabled}
+      activeOpacity={0.8}
+    >
+      <Text style={[styles.rowText, danger && { color: "white" }]}>{label}</Text>
+      <Text style={[styles.chev, danger && { color: "white" }]}>{">"}</Text>
     </TouchableOpacity>
   );
 
   return (
     <View style={styles.container}>
-    {/* Top Logo Bar — uniform with Profile */}
+      {/* Top Logo Bar — uniform with Profile */}
       <View style={styles.logoBar}>
         <Image
           source={{
@@ -51,7 +79,7 @@ export default function Settings() {
           <View style={{ width: 60 }} />
         </View>
 
-        {/* List (no Settings row here) */}
+        {/* List */}
         <View style={styles.listWrap}>
           <Row label="Change Password" onPress={safePush("/changePw")} />
           <View style={styles.divider} />
@@ -60,10 +88,10 @@ export default function Settings() {
           <Row label="About" onPress={safePush("/about")} />
           <View style={styles.divider} />
           <Row
-            label="Logout"
-            onPress={() => {
-              router.replace("/login");
-            }}
+            label={busy ? "Logging out..." : "Logout"}
+            onPress={onLogout}
+            danger
+            disabled={busy}
           />
         </View>
       </ScrollView>

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import {
   View,
   Text,
@@ -9,67 +9,126 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { useRouter } from "expo-router";
+import { useFocusEffect } from "@react-navigation/native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { supabase } from "../lib/supabase";
 
 const TRAINING_MODULES = [
   {
     key: "floor",
     label: "Floor Cleaning",
-    image:
-      "https://raw.githubusercontent.com/Jkschlo/Longo_App/main/Vacuum.JPG",
-    progress: 85,
+    image: "https://raw.githubusercontent.com/Jkschlo/Longo_App/main/Vacuum.JPG",
     route: "/floorCleaning",
   },
   {
     key: "duct",
     label: "Duct Cleaning",
     image: "https://raw.githubusercontent.com/Jkschlo/Longo_App/main/duct.JPG",
-    progress: 100,
     route: "/ductCleaning",
   },
   {
     key: "flood",
     label: "Flood Restoration",
     image: "https://raw.githubusercontent.com/Jkschlo/Longo_App/main/flood.JPG",
-    progress: 60,
     route: "/floodRestoration",
   },
   {
     key: "truck",
     label: "Truck Maintenance",
     image: "https://raw.githubusercontent.com/Jkschlo/Longo_App/main/truck.JPG",
-    progress: 90,
     route: "/truckMaintenance",
   },
   {
     key: "safety",
     label: "Safety / OSHA",
-    image:
-      "https://raw.githubusercontent.com/Jkschlo/Longo_App/main/safetyvest.JPG",
-    progress: 0,
+    image: "https://raw.githubusercontent.com/Jkschlo/Longo_App/main/safetyvest.JPG",
     route: "/placeholder",
   },
   {
     key: "equip",
     label: "Equipment",
-    image:
-      "https://raw.githubusercontent.com/Jkschlo/Longo_App/main/airmover.JPG",
-    progress: 75,
+    image: "https://raw.githubusercontent.com/Jkschlo/Longo_App/main/airmover.JPG",
     route: "/placeholder",
   },
 ];
 
 export default function Training() {
   const router = useRouter();
+  const [progressMap, setProgressMap] = useState({});
+  const [firstName, setFirstName] = useState("");
+
+  const keys = TRAINING_MODULES.map((m) => m.key);
+
+  const loadProgress = useCallback(async () => {
+    try {
+      const map = await getProgressBulk(keys);
+      setProgressMap(map);
+    } catch {}
+  }, [keys]);
+
+  // Helper to derive first name from a full name string
+  const deriveFirst = (full) => {
+    if (!full) return "";
+    const parts = String(full).trim().split(/\s+/).filter(Boolean);
+    return parts[0] || "";
+  };
+
+  // Load name: prefer profiles.first_name; else derive from full_name; else local cache
+  const loadFirstName = useCallback(async () => {
+    try {
+      const { data: sess } = await supabase.auth.getSession();
+      const user = sess?.session?.user || null;
+
+      if (user) {
+        const { data: row, error } = await supabase
+          .from("profiles")
+          .select("first_name, full_name")
+          .eq("id", user.id)
+          .maybeSingle();
+
+        if (!error && row) {
+          const chosen = row.first_name?.trim() || deriveFirst(row.full_name);
+          if (chosen) {
+            setFirstName(chosen);
+            return;
+          }
+        }
+      }
+
+      // Fallback: local cache (“userProfile.name”)
+      const json = await AsyncStorage.getItem("userProfile");
+      if (json) {
+        const data = JSON.parse(json);
+        const chosen = deriveFirst(data?.name);
+        if (chosen) setFirstName(chosen);
+      }
+    } catch {
+      const json = await AsyncStorage.getItem("userProfile");
+      if (json) {
+        const data = JSON.parse(json);
+        const chosen = deriveFirst(data?.name);
+        if (chosen) setFirstName(chosen);
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    loadProgress();
+    loadFirstName();
+  }, [loadProgress, loadFirstName]);
+
+  useFocusEffect(
+    useCallback(() => {
+      loadProgress();
+      loadFirstName();
+    }, [loadProgress, loadFirstName])
+  );
 
   const renderItem = ({ item }) => {
-    const pct = Math.max(0, Math.min(100, item.progress ?? 0));
+    const pct = Math.max(0, Math.min(100, progressMap[item.key]?.percent ?? 0));
     return (
       <Pressable style={styles.card} onPress={() => router.push(item.route)}>
-        <Image
-          source={{ uri: item.image }}
-          style={styles.cardImg}
-          resizeMode="contain"
-        />
+        <Image source={{ uri: item.image }} style={styles.cardImg} resizeMode="contain" />
         <Text style={styles.cardLabel}>{item.label}</Text>
         <View style={styles.progressRow}>
           <View style={styles.progressTrack}>
@@ -80,6 +139,13 @@ export default function Training() {
       </Pressable>
     );
   };
+
+  // Possessive helper (James' vs Jackson's). Style choice: names ending in "s" -> just apostrophe.
+  const possessive = firstName
+    ? /s$/i.test(firstName) ? `${firstName}'` : `${firstName}'s`
+    : null;
+
+  const headerText = possessive ? `${possessive} Training` : "My Training";
 
   return (
     <View style={styles.container}>
@@ -94,8 +160,8 @@ export default function Training() {
         />
       </View>
 
-      {/* Header (white text, no back arrow on Training) */}
-      <Text style={styles.header}>My Training</Text>
+      {/* Header (white text, dynamic first name possessive) */}
+      <Text style={styles.header}>{headerText}</Text>
 
       {/* Scrollable grid */}
       <FlatList
@@ -109,40 +175,25 @@ export default function Training() {
 
       {/* Bottom Nav (same as Profile.jsx) */}
       <View style={styles.bottomNav}>
-        <TouchableOpacity
-          style={styles.navItem}
-          onPress={() => router.push("/quizzes")}
-        >
+        <TouchableOpacity style={styles.navItem} onPress={() => router.push("/quizzes")}>
           <Image
-            source={{
-              uri: "https://raw.githubusercontent.com/Jkschlo/Longo_App/main/quizzes.png",
-            }}
+            source={{ uri: "https://raw.githubusercontent.com/Jkschlo/Longo_App/main/quizzes.png" }}
             style={styles.navIcon}
           />
           <Text style={styles.navText}>Quizzes</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity
-          style={styles.navItem}
-          onPress={() => router.push("/training")}
-        >
+        <TouchableOpacity style={styles.navItem} onPress={() => router.push("/training")}>
           <Image
-            source={{
-              uri: "https://github.com/Jkschlo/Longo_App/blob/main/training.JPG?raw=true",
-            }}
+            source={{ uri: "https://github.com/Jkschlo/Longo_App/blob/main/training.JPG?raw=true" }}
             style={styles.navIcon}
           />
           <Text style={styles.navText}>Training</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity
-          style={styles.navItem}
-          onPress={() => router.push("/profile")}
-        >
+        <TouchableOpacity style={styles.navItem} onPress={() => router.push("/profile")}>
           <Image
-            source={{
-              uri: "https://github.com/Jkschlo/Longo_App/blob/main/profile.JPG?raw=true",
-            }}
+            source={{ uri: "https://github.com/Jkschlo/Longo_App/blob/main/profile.JPG?raw=true" }}
             style={styles.navIcon}
           />
           <Text style={styles.navText}>Profile</Text>
@@ -161,9 +212,9 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     borderBottomWidth: 0,
     borderBottomColor: "#eee",
-    justifyContent: "flex-end", // push content to the bottom
-    alignItems: "center", // center horizontally
-    paddingBottom: 8, // tweak spacing from bottom as needed
+    justifyContent: "flex-end",
+    alignItems: "center",
+    paddingBottom: 8,
   },
   logo: { width: 140, height: 40 },
 
@@ -193,7 +244,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
   },
   cardLabel: {
-    align: "center",
     textAlign: "center",
     fontSize: 14,
     fontWeight: "700",

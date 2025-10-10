@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import {
   View,
   Text,
@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { useRouter } from "expo-router";
+import { useFocusEffect } from "@react-navigation/native";
 
 const SUBMODULES = [
   {
@@ -16,78 +17,98 @@ const SUBMODULES = [
     label: "Residential",
     route: "/residential",
     img: "https://raw.githubusercontent.com/Jkschlo/Longo_App/main/Vacuum.JPG",
-    progress: 40,
+    // progress: 40, // old hard-coded values are ignored now
   },
   {
     key: "commercial",
     label: "Commercial",
     route: "/commercial",
     img: "https://raw.githubusercontent.com/Jkschlo/Longo_App/main/spinner.JPG",
-    progress: 70,
   },
   {
     key: "rugs",
     label: "Area Rugs",
     route: "/areaRugs",
     img: "https://raw.githubusercontent.com/Jkschlo/Longo_App/main/arearug.JPG",
-    progress: 20,
   },
   {
     key: "stairs",
     label: "Stairs",
     route: "/stairs",
     img: "https://raw.githubusercontent.com/Jkschlo/Longo_App/main/stairs.JPG",
-    progress: 55,
   },
   {
     key: "upholstery",
     label: "Upholstery",
     route: "/upholstery",
     img: "https://raw.githubusercontent.com/Jkschlo/Longo_App/main/upholstery.JPG",
-    progress: 10,
   },
   {
     key: "ceramic",
     label: "Ceramic Flooring",
     route: "/ceramic",
     img: "https://raw.githubusercontent.com/Jkschlo/Longo_App/main/ceramic.JPG",
-    progress: 0,
   },
   {
     key: "wood",
     label: "Wood Flooring",
     route: "/wood",
     img: "https://raw.githubusercontent.com/Jkschlo/Longo_App/main/wood.JPG",
-    progress: 15,
   },
   {
     key: "stripwax",
     label: "Strip & Wax",
     route: "/stripWax",
     img: "https://raw.githubusercontent.com/Jkschlo/Longo_App/main/strip.JPG",
-    progress: 35,
   },
   {
     key: "vinyl",
     label: "Vinyl",
     route: "/vinyl",
     img: "https://raw.githubusercontent.com/Jkschlo/Longo_App/main/vinyl.JPG",
-    progress: 80,
   },
   {
     key: "additional",
     label: "Additional Services",
     route: "/additional",
     img: "https://raw.githubusercontent.com/Jkschlo/Longo_App/main/additional.JPG",
-    progress: 5,
   },
 ];
 
 export default function FloorCleaning() {
   const router = useRouter();
 
+  // NEW: dynamic progress map, defaults to {} but we’ll fill with 0% for each key
+  const [progressMap, setProgressMap] = useState({});
+
+  const keys = SUBMODULES.map((m) => m.key);
+
+  const loadProgress = useCallback(async () => {
+    try {
+      const map = await getProgressBulk(keys);
+      setProgressMap(map);
+    } catch {
+      // leave defaults if anything fails
+      const fallback = {};
+      keys.forEach((k) => (fallback[k] = { percent: 0, status: "not_started" }));
+      setProgressMap(fallback);
+    }
+  }, [keys]);
+
+  // load once on mount
+  useEffect(() => {
+    loadProgress();
+  }, [loadProgress]);
+
+  // refresh when returning to this screen
+  useFocusEffect(
+    useCallback(() => {
+      loadProgress();
+    }, [loadProgress])
+  );
+
   const renderItem = ({ item }) => {
-    const pct = Math.max(0, Math.min(100, item.progress ?? 0));
+    const pct = Math.max(0, Math.min(100, progressMap[item.key]?.percent ?? 0));
     return (
       <Pressable style={styles.card} onPress={() => router.push(item.route)}>
         <Image
@@ -192,9 +213,9 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     borderBottomWidth: 0,
     borderBottomColor: "#eee",
-    justifyContent: "flex-end", // push content to the bottom
-    alignItems: "center", // center horizontally
-    paddingBottom: 8, // tweak spacing from bottom as needed
+    justifyContent: "flex-end",
+    alignItems: "center",
+    paddingBottom: 8,
   },
   logo: { width: 140, height: 40 },
 

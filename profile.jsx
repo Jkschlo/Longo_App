@@ -1,109 +1,146 @@
-// app/profile.jsx
-import React from "react";
+import React, { useEffect, useMemo, useState } from "react";
+import { useRouter } from "expo-router";
 import {
   View,
   Text,
   Image,
   StyleSheet,
   TouchableOpacity,
+  Alert,
+  Linking,
   ScrollView,
-  Pressable,
 } from "react-native";
-import { useRouter, usePathname } from "expo-router";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Ionicons } from "@expo/vector-icons";
+import { supabase } from "../lib/supabase";
 
 export default function Profile() {
   const router = useRouter();
-  const pathname = usePathname();
+  const [fullName, setFullName] = useState("");
 
-  const safePush = (href) => () => {
-    if (pathname !== href) router.push(href);
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        const { data: sess } = await supabase.auth.getSession();
+        const user = sess?.session?.user || null;
+
+        if (user) {
+          const { data: row, error } = await supabase
+            .from("profiles")
+            .select("full_name")
+            .eq("id", user.id)
+            .maybeSingle();
+
+          if (!error && row?.full_name && mounted) {
+            setFullName(String(row.full_name).trim());
+            return;
+          }
+        }
+
+        // Fallback: local cache
+        const json = await AsyncStorage.getItem("userProfile");
+        if (mounted && json) {
+          try {
+            const data = JSON.parse(json);
+            if (data?.name) setFullName(String(data.name).trim());
+          } catch {}
+        }
+      } catch {
+        const json = await AsyncStorage.getItem("userProfile");
+        if (mounted && json) {
+          try {
+            const data = JSON.parse(json);
+            if (data?.name) setFullName(String(data.name).trim());
+          } catch {}
+        }
+      }
+    })();
+    return () => { mounted = false; };
+  }, []);
+
+  const openReviews = async () => {
+    const url = "https://www.google.com/search?q=Longo+Carpet+Cleaning+reviews";
+    const ok = await Linking.canOpenURL(url);
+    if (ok) Linking.openURL(url);
+    else Alert.alert("Unable to open link", "Please try again later.");
   };
-
-  const Row = ({ label, onPress }) => (
-    <TouchableOpacity style={styles.row} onPress={onPress}>
-      <Text style={styles.rowText}>{label}</Text>
-      <Text style={styles.chev}>{">"}</Text>
-    </TouchableOpacity>
-  );
 
   return (
     <View style={styles.container}>
-      {/* Top Logo Bar */}
+      {/* Top Logo Bar (exact) */}
       <View style={styles.logoBar}>
         <Image
-          source={{
-            uri: "https://raw.githubusercontent.com/Jkschlo/Longo_App/main/Longo%20Logo.png",
-          }}
+          source={{ uri: "https://raw.githubusercontent.com/Jkschlo/Longo_App/main/Longo%20Logo.png" }}
           style={styles.logo}
           resizeMode="contain"
         />
       </View>
 
-      {/* Header under logo: spacer (left), (optional title), cog (right) */}
-      <View style={styles.headerRow}>
-        <View style={{ width: 60 }} />
-        {/* <Text style={styles.title}>Profile</Text>  // add back if you want a centered title */}
-        <Pressable onPress={safePush("/settings")} hitSlop={12}>
-          <Text style={styles.cogIcon}>⚙️</Text>
-        </Pressable>
-      </View>
-
-      {/* Blue content */}
-      <ScrollView contentContainerStyle={{ paddingBottom: 100 }}>
-        {/* Avatar + Name Block */}
-        <View style={styles.centerBlock}>
-          <View style={styles.avatarCircle}>
-            <Image
-              source={{
-                uri: "https://raw.githubusercontent.com/Jkschlo/Longo_App/main/Joe.JPG",
-              }}
-              style={styles.avatarImg}
-              resizeMode="cover"
-            />
-          </View>
-          <Text style={styles.name}>Joe Longo</Text>
-          <Text style={styles.role}>Technician</Text>
+      <ScrollView contentContainerStyle={{ paddingBottom: 120 }} keyboardShouldPersistTaps="handled">
+        {/* Avatar circle (generic icon) */}
+        <View style={styles.avatarCircle}>
+          <Ionicons name="person-circle-outline" size={92} color="#9aa3b2" />
         </View>
 
-        {/* Menu list (no Settings row) */}
-        <View style={styles.cardList}>
-          <Row label="Google Reviews" onPress={safePush("/reviews")} />
-          <View style={styles.divider} />
-          <Row label="Badges" onPress={safePush("/badges")} />
-          <View style={styles.divider} />
-          <Row label="Company Handbook" onPress={safePush("/handbook")} />
-          <View style={styles.divider} />
-          <Row label="FAQs" onPress={safePush("/faqs")} />
+        <Text style={styles.nameText}>{fullName || " "}</Text>
+        <Text style={styles.roleText}>Technician</Text>
+
+        {/* Cards */}
+        <View style={styles.cardsGrid}>
+          <TouchableOpacity style={styles.card} activeOpacity={0.9} onPress={openReviews}>
+            <Ionicons name="star-outline" size={22} />
+            <Text style={styles.cardTitle}>Google Reviews</Text>
+            <Text style={styles.cardSub}>Rate us / read reviews</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.card} activeOpacity={0.9} onPress={() => router.push("/badges")}>
+            <Ionicons name="medal-outline" size={22} />
+            <Text style={styles.cardTitle}>Badges</Text>
+            <Text style={styles.cardSub}>Earn & view progress</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.card} activeOpacity={0.9} onPress={() => router.push("/handbook")}>
+            <Ionicons name="book-outline" size={22} />
+            <Text style={styles.cardTitle}>Company Handbook</Text>
+            <Text style={styles.cardSub}>Policies & procedures</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.card} activeOpacity={0.9} onPress={() => router.push("/faqs")}>
+            <Ionicons name="help-circle-outline" size={22} />
+            <Text style={styles.cardTitle}>FAQs</Text>
+            <Text style={styles.cardSub}>Quick answers</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.card} activeOpacity={0.9} onPress={() => router.push("/settings")}>
+            <Ionicons name="settings-outline" size={22} />
+            <Text style={styles.cardTitle}>Settings</Text>
+            <Text style={styles.cardSub}>Update preferences</Text>
+          </TouchableOpacity>
         </View>
       </ScrollView>
 
-      {/* Bottom Nav (image icons) */}
+      {/* Bottom Nav (exact) */}
       <View style={styles.bottomNav}>
-        <TouchableOpacity style={styles.navItem} onPress={safePush("/quizzes")}>
+        <TouchableOpacity style={styles.navItem} onPress={() => router.push("/quizzes")}>
           <Image
-            source={{
-              uri: "https://raw.githubusercontent.com/Jkschlo/Longo_App/main/quizzes.png",
-            }}
+            source={{ uri: "https://raw.githubusercontent.com/Jkschlo/Longo_App/main/quizzes.png" }}
             style={styles.navIcon}
           />
           <Text style={styles.navText}>Quizzes</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.navItem} onPress={safePush("/training")}>
+        <TouchableOpacity style={styles.navItem} onPress={() => router.push("/training")}>
           <Image
-            source={{
-              uri: "https://github.com/Jkschlo/Longo_App/blob/main/training.JPG?raw=true",
-            }}
+            source={{ uri: "https://github.com/Jkschlo/Longo_App/blob/main/training.JPG?raw=true" }}
             style={styles.navIcon}
           />
           <Text style={styles.navText}>Training</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.navItem} onPress={safePush("/profile")}>
+        <TouchableOpacity style={styles.navItem} onPress={() => router.push("/profile")}>
           <Image
-            source={{
-              uri: "https://github.com/Jkschlo/Longo_App/blob/main/profile.JPG?raw=true",
-            }}
+            source={{ uri: "https://github.com/Jkschlo/Longo_App/blob/main/profile.JPG?raw=true" }}
             style={styles.navIcon}
           />
           <Text style={styles.navText}>Profile</Text>
@@ -113,11 +150,9 @@ export default function Profile() {
   );
 }
 
+const CARD_W = "48%";
 const styles = StyleSheet.create({
-  // Page background
   container: { flex: 1, backgroundColor: "#093075" },
-
-  // Top logo bar (uniform)
   logoBar: {
     height: 90,
     backgroundColor: "#fff",
@@ -128,76 +163,40 @@ const styles = StyleSheet.create({
     paddingBottom: 8,
   },
   logo: { width: 140, height: 40 },
-
-  // Header row with (optional) title & cog
-  headerRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 12,
-    paddingVertical: 12,
-    justifyContent: "space-between",
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: "800",
-    textAlign: "center",
-    flex: 1,
-    color: "#fff",
-  },
-  cogIcon: {
-    fontSize: 25,
-    color: "#fff",
-    fontWeight: "700",
-    width: 60,
-    textAlign: "right",
-  },
-
-  // Profile content
-  centerBlock: { alignItems: "center", marginTop: 6, marginBottom: 10 },
   avatarCircle: {
-    width: 92,
-    height: 92,
-    borderRadius: 46,
-    backgroundColor: "#0f4b95",
-    borderWidth: 2,
-    borderColor: "#fff",
+    width: 110,
+    height: 110,
+    borderRadius: 999,
+    backgroundColor: "#fff",
+    alignSelf: "center",
     alignItems: "center",
     justifyContent: "center",
-    marginBottom: 10,
-    padding: 2,          // small padding so the image sits inside the white border
-    overflow: "hidden",  // ensures the image clips to the circle
+    borderWidth: 1,
+    borderColor: "#e7eef8",
+    marginTop: 16,
   },
-  avatarImg: {
-    width: "100%",
-    height: "100%",
-    borderRadius: 46,
-  },
-  name: { color: "#fff", fontSize: 22, fontWeight: "800" },
-  role: { color: "#BFD0EA", marginTop: 2, fontWeight: "700" },
-
-  cardList: {
-    backgroundColor: "transparent",
-    marginTop: 8,
-    marginHorizontal: 12,
-    borderRadius: 12,
-  },
-  row: {
-    paddingHorizontal: 14,
-    paddingVertical: 16,
+  nameText: { fontSize: 20, fontWeight: "800", color: "#fff", textAlign: "center", marginTop: 12 },
+  roleText: { fontSize: 12, color: "#cfe2ff", textAlign: "center", marginTop: 4, opacity: 0.9 },
+  cardsGrid: {
+    marginTop: 18,
     flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "center",
+    gap: 12,
+    paddingHorizontal: 12,
+  },
+  card: {
+    width: CARD_W,
+    backgroundColor: "#fff",
+    borderWidth: 1,
+    borderColor: "#eee",
+    borderRadius: 12,
+    paddingVertical: 16,
+    paddingHorizontal: 14,
     alignItems: "center",
-    justifyContent: "space-between",
   },
-  rowText: { color: "#fff", fontSize: 18, fontWeight: "800" },
-  chev: { color: "#fff", fontSize: 20, fontWeight: "900" },
-  divider: {
-    height: 1,
-    backgroundColor: "#0a2f6a",
-    marginHorizontal: 14,
-    opacity: 0.75,
-  },
-
-  // Bottom nav (uniform)
+  cardTitle: { fontSize: 14, fontWeight: "800", color: "#000", marginTop: 8, textAlign: "center" },
+  cardSub: { fontSize: 11, marginTop: 4, opacity: 0.7, textAlign: "center" },
   bottomNav: {
     position: "absolute",
     bottom: 0,
