@@ -26,7 +26,7 @@ const COLORS = {
   shadow: "#000",
 };
 
-/** ===== Shell styles (now matches Training logoBar exactly) ===== */
+/** ===== Shell styles (matches your current screen) ===== */
 const shellStyles = StyleSheet.create({
   shell: { flex: 1, backgroundColor: COLORS.white }, // white space around card
   topBox: {
@@ -35,9 +35,9 @@ const shellStyles = StyleSheet.create({
     borderBottomWidth: 0,
     justifyContent: "flex-end",
     alignItems: "center",
-    paddingBottom: 8, // EXACT like training.jsx
+    paddingBottom: 8,
   },
-  topLogo: { width: 140, height: 50 }, // EXACT like training.jsx
+  topLogo: { width: 140, height: 50 },
   centerArea: { flex: 1, padding: 16, backgroundColor: COLORS.white }, // white behind card
   bottomBox: {
     backgroundColor: COLORS.white,
@@ -55,7 +55,7 @@ const shellStyles = StyleSheet.create({
 const AuthShell = ({ children }) => {
   return (
     <View style={shellStyles.shell}>
-      {/* Top logo box (exact match to Training) */}
+      {/* Top logo box */}
       <View style={shellStyles.topBox}>
         <Image
           source={{
@@ -69,7 +69,7 @@ const AuthShell = ({ children }) => {
       {/* Center (white space around the dark card) */}
       <View style={shellStyles.centerArea}>{children}</View>
 
-      {/* Bottom logo box (unchanged) */}
+      {/* Bottom logo box */}
       <View style={shellStyles.bottomBox}>
         <Image
           source={{
@@ -210,7 +210,9 @@ export default function CreateLogin() {
             <Text style={styles.subtitle}>Let’s get you set up.</Text>
 
             {/* NAME */}
-            <Text style={styles.label}>NAME</Text>
+            <Text style={styles.label}>
+              NAME<Text style={styles.required}> *</Text>
+            </Text>
             <TextInput
               style={styles.input}
               autoCapitalize="words"
@@ -221,7 +223,9 @@ export default function CreateLogin() {
             {!!errors.name && <Text style={styles.error}>{errors.name}</Text>}
 
             {/* EMAIL */}
-            <Text style={[styles.label, { marginTop: 12 }]}>EMAIL</Text>
+            <Text style={[styles.label, { marginTop: 12 }]}>
+              EMAIL<Text style={styles.required}> *</Text>
+            </Text>
             <TextInput
               style={styles.input}
               autoCapitalize="none"
@@ -233,7 +237,9 @@ export default function CreateLogin() {
             {!!errors.email && <Text style={styles.error}>{errors.email}</Text>}
 
             {/* PASSWORD */}
-            <Text style={[styles.label, { marginTop: 12 }]}>PASSWORD</Text>
+            <Text style={[styles.label, { marginTop: 12 }]}>
+              PASSWORD<Text style={styles.required}> *</Text>
+            </Text>
             <View style={styles.passwordRow}>
               <TextInput
                 style={[styles.input, styles.inputWithIcon]}
@@ -263,7 +269,7 @@ export default function CreateLogin() {
 
             {/* CONFIRM PASSWORD */}
             <Text style={[styles.label, { marginTop: 12 }]}>
-              CONFIRM PASSWORD
+              CONFIRM PASSWORD<Text style={styles.required}> *</Text>
             </Text>
             <View style={styles.passwordRow}>
               <TextInput
@@ -343,6 +349,7 @@ const styles = StyleSheet.create({
   title: { fontSize: 28, fontWeight: "900", color: COLORS.white },
   subtitle: { fontSize: 12, color: "#cfe2ff", marginTop: 6, marginBottom: 12 },
   label: { color: "#cfe2ff", fontSize: 12, marginBottom: 6, marginTop: 6 },
+  required: { color: "#ff5c5c", fontWeight: "900" }, // red asterisk
   input: {
     backgroundColor: "#274a7e",
     color: COLORS.white,

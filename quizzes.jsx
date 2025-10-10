@@ -2,17 +2,16 @@ import React from "react";
 import { useRouter } from "expo-router";
 import { StyleSheet, Text, View, Image, TouchableOpacity } from "react-native";
 
-
-const Home = () => {
+const Quizzes = () => {
   const router = useRouter();
 
   return (
     <View style={styles.container}>
-      {/* Top Logo Box */}
-      <View style={styles.topBox}>
+      {/* Top Logo Bar (EXACT match to Profile) */}
+      <View style={styles.logoBar}>
         <Image
           source={{
-            uri: "https://github.com/Jkschlo/Longo_App/blob/main/Longo Logo.png?raw=true",
+            uri: "https://raw.githubusercontent.com/Jkschlo/Longo_App/main/Longo%20Logo.png",
           }}
           style={styles.logo}
           resizeMode="contain"
@@ -24,45 +23,30 @@ const Home = () => {
 
       {/* Main Content Placeholder */}
       <View style={styles.content}>
-        <Text style={styles.placeholderText}>Quizzes coming soon.</Text>
+        <Text style={styles.placeholderText}>Quiz Page Coming Soon.</Text>
       </View>
 
       {/* Bottom Nav */}
       <View style={styles.bottomNav}>
-        <TouchableOpacity
-          style={styles.navItem}
-          onPress={() => router.push("/quizzes")}
-        >
+        <TouchableOpacity style={styles.navItem} onPress={() => router.push("/quizzes")}>
           <Image
-            source={{
-              uri: "https://raw.githubusercontent.com/Jkschlo/Longo_App/main/quizzes.png",
-            }}
+            source={{ uri: "https://raw.githubusercontent.com/Jkschlo/Longo_App/main/quizzes.png" }}
             style={styles.navIcon}
           />
           <Text style={styles.navText}>Quizzes</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity
-          style={styles.navItem}
-          onPress={() => router.push("/training")}
-        >
+        <TouchableOpacity style={styles.navItem} onPress={() => router.push("/training")}>
           <Image
-            source={{
-              uri: "https://github.com/Jkschlo/Longo_App/blob/main/training.JPG?raw=true",
-            }}
+            source={{ uri: "https://github.com/Jkschlo/Longo_App/blob/main/training.JPG?raw=true" }}
             style={styles.navIcon}
           />
           <Text style={styles.navText}>Training</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity
-          style={styles.navItem}
-          onPress={() => router.push("/profile")}
-        >
+        <TouchableOpacity style={styles.navItem} onPress={() => router.push("/profile")}>
           <Image
-            source={{
-              uri: "https://github.com/Jkschlo/Longo_App/blob/main/profile.JPG?raw=true",
-            }}
+            source={{ uri: "https://github.com/Jkschlo/Longo_App/blob/main/profile.JPG?raw=true" }}
             style={styles.navIcon}
           />
           <Text style={styles.navText}>Profile</Text>
@@ -72,23 +56,20 @@ const Home = () => {
   );
 };
 
-export default Home;
+export default Quizzes;
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#093075" },
-  topBox: {
-    backgroundColor: "#fff",
-    alignItems: "center",
-    paddingVertical: 10,
-  },
+
+  // EXACT copy of Profile's logo bar
   logoBar: {
     height: 90,
     backgroundColor: "#fff",
     borderBottomWidth: 0,
     borderBottomColor: "#eee",
-    justifyContent: "flex-end", // push content to the bottom
-    alignItems: "center", // center horizontally
-    paddingBottom: 8, // tweak spacing from bottom as needed
+    justifyContent: "flex-end",
+    alignItems: "center",
+    paddingBottom: 8,
   },
   logo: { width: 140, height: 40 },
 
@@ -102,6 +83,7 @@ const styles = StyleSheet.create({
   },
   content: { flex: 1, justifyContent: "center", alignItems: "center" },
   placeholderText: { color: "#fff", fontSize: 18 },
+
   bottomNav: {
     position: "absolute",
     bottom: 0,

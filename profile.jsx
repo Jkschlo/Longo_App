@@ -56,7 +56,9 @@ export default function Profile() {
         }
       }
     })();
-    return () => { mounted = false; };
+    return () => {
+      mounted = false;
+    };
   }, []);
 
   const openReviews = async () => {
@@ -71,13 +73,18 @@ export default function Profile() {
       {/* Top Logo Bar (exact) */}
       <View style={styles.logoBar}>
         <Image
-          source={{ uri: "https://raw.githubusercontent.com/Jkschlo/Longo_App/main/Longo%20Logo.png" }}
+          source={{
+            uri: "https://raw.githubusercontent.com/Jkschlo/Longo_App/main/Longo%20Logo.png",
+          }}
           style={styles.logo}
           resizeMode="contain"
         />
       </View>
 
-      <ScrollView contentContainerStyle={{ paddingBottom: 120 }} keyboardShouldPersistTaps="handled">
+      <ScrollView
+        contentContainerStyle={{ paddingBottom: 120 }}
+        keyboardShouldPersistTaps="handled"
+      >
         {/* Avatar circle (generic icon) */}
         <View style={styles.avatarCircle}>
           <Ionicons name="person-circle-outline" size={92} color="#9aa3b2" />
@@ -88,31 +95,61 @@ export default function Profile() {
 
         {/* Cards */}
         <View style={styles.cardsGrid}>
-          <TouchableOpacity style={styles.card} activeOpacity={0.9} onPress={openReviews}>
+          <TouchableOpacity
+            style={styles.card}
+            activeOpacity={0.9}
+            onPress={() =>
+              Linking.openURL("https://www.longocarpetcleaning.com/reviews")
+            }
+          >
             <Ionicons name="star-outline" size={22} />
             <Text style={styles.cardTitle}>Google Reviews</Text>
             <Text style={styles.cardSub}>Rate us / read reviews</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.card} activeOpacity={0.9} onPress={() => router.push("/badges")}>
-            <Ionicons name="medal-outline" size={22} />
-            <Text style={styles.cardTitle}>Badges</Text>
-            <Text style={styles.cardSub}>Earn & view progress</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.card} activeOpacity={0.9} onPress={() => router.push("/handbook")}>
+          {/* Company Handbook → PDF via Google Docs viewer */}
+          <TouchableOpacity
+            style={styles.card}
+            activeOpacity={0.9}
+            onPress={() =>
+              Linking.openURL(
+                `https://docs.google.com/gview?embedded=1&url=${encodeURIComponent(
+                  "https://raw.githubusercontent.com/Jkschlo/Longo_App/main/Employee%20Handbook%202025.pdf"
+                )}`
+              )
+            }
+          >
             <Ionicons name="book-outline" size={22} />
             <Text style={styles.cardTitle}>Company Handbook</Text>
             <Text style={styles.cardSub}>Policies & procedures</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.card} activeOpacity={0.9} onPress={() => router.push("/faqs")}>
+          {/* Badges → in-app route */}
+          <TouchableOpacity
+            style={styles.card}
+            activeOpacity={0.9}
+            onPress={() => router.push("/badges")}
+          >
+            <Ionicons name="medal-outline" size={22} />
+            <Text style={styles.cardTitle}>Badges</Text>
+            <Text style={styles.cardSub}>Earn & view progress</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.card}
+            activeOpacity={0.9}
+            onPress={() => router.push("/faqs")}
+          >
             <Ionicons name="help-circle-outline" size={22} />
             <Text style={styles.cardTitle}>FAQs</Text>
             <Text style={styles.cardSub}>Quick answers</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.card} activeOpacity={0.9} onPress={() => router.push("/settings")}>
+          <TouchableOpacity
+            style={styles.card}
+            activeOpacity={0.9}
+            onPress={() => router.push("/settings")}
+          >
             <Ionicons name="settings-outline" size={22} />
             <Text style={styles.cardTitle}>Settings</Text>
             <Text style={styles.cardSub}>Update preferences</Text>
@@ -122,25 +159,40 @@ export default function Profile() {
 
       {/* Bottom Nav (exact) */}
       <View style={styles.bottomNav}>
-        <TouchableOpacity style={styles.navItem} onPress={() => router.push("/quizzes")}>
+        <TouchableOpacity
+          style={styles.navItem}
+          onPress={() => router.push("/quizzes")}
+        >
           <Image
-            source={{ uri: "https://raw.githubusercontent.com/Jkschlo/Longo_App/main/quizzes.png" }}
+            source={{
+              uri: "https://raw.githubusercontent.com/Jkschlo/Longo_App/main/quizzes.png",
+            }}
             style={styles.navIcon}
           />
           <Text style={styles.navText}>Quizzes</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.navItem} onPress={() => router.push("/training")}>
+        <TouchableOpacity
+          style={styles.navItem}
+          onPress={() => router.push("/training")}
+        >
           <Image
-            source={{ uri: "https://github.com/Jkschlo/Longo_App/blob/main/training.JPG?raw=true" }}
+            source={{
+              uri: "https://github.com/Jkschlo/Longo_App/blob/main/training.JPG?raw=true",
+            }}
             style={styles.navIcon}
           />
           <Text style={styles.navText}>Training</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.navItem} onPress={() => router.push("/profile")}>
+        <TouchableOpacity
+          style={styles.navItem}
+          onPress={() => router.push("/profile")}
+        >
           <Image
-            source={{ uri: "https://github.com/Jkschlo/Longo_App/blob/main/profile.JPG?raw=true" }}
+            source={{
+              uri: "https://github.com/Jkschlo/Longo_App/blob/main/profile.JPG?raw=true",
+            }}
             style={styles.navIcon}
           />
           <Text style={styles.navText}>Profile</Text>
@@ -175,8 +227,20 @@ const styles = StyleSheet.create({
     borderColor: "#e7eef8",
     marginTop: 16,
   },
-  nameText: { fontSize: 20, fontWeight: "800", color: "#fff", textAlign: "center", marginTop: 12 },
-  roleText: { fontSize: 12, color: "#cfe2ff", textAlign: "center", marginTop: 4, opacity: 0.9 },
+  nameText: {
+    fontSize: 20,
+    fontWeight: "800",
+    color: "#fff",
+    textAlign: "center",
+    marginTop: 12,
+  },
+  roleText: {
+    fontSize: 12,
+    color: "#cfe2ff",
+    textAlign: "center",
+    marginTop: 4,
+    opacity: 0.9,
+  },
   cardsGrid: {
     marginTop: 18,
     flexDirection: "row",
@@ -195,7 +259,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     alignItems: "center",
   },
-  cardTitle: { fontSize: 14, fontWeight: "800", color: "#000", marginTop: 8, textAlign: "center" },
+  cardTitle: {
+    fontSize: 14,
+    fontWeight: "800",
+    color: "#000",
+    marginTop: 8,
+    textAlign: "center",
+  },
   cardSub: { fontSize: 11, marginTop: 4, opacity: 0.7, textAlign: "center" },
   bottomNav: {
     position: "absolute",
