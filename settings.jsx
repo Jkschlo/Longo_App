@@ -12,7 +12,8 @@ import {
 } from "react-native";
 import { useRouter, usePathname } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { supabase } from "../lib/supabase";
+import { supabase } from "../../lib/supabase";
+import { Ionicons } from "@expo/vector-icons";
 
 export default function Settings() {
   const router = useRouter();
@@ -49,7 +50,9 @@ export default function Settings() {
       disabled={disabled}
       activeOpacity={0.8}
     >
-      <Text style={[styles.rowText, danger && { color: "white" }]}>{label}</Text>
+      <Text style={[styles.rowText, danger && { color: "white" }]}>
+        {label}
+      </Text>
       <Text style={[styles.chev, danger && { color: "white" }]}>{">"}</Text>
     </TouchableOpacity>
   );
@@ -98,17 +101,18 @@ export default function Settings() {
 
       {/* Bottom Nav — uniform with Profile */}
       <View style={styles.bottomNav}>
-        <TouchableOpacity style={styles.navItem} onPress={safePush("/quizzes")}>
-          <Image
-            source={{
-              uri: "https://raw.githubusercontent.com/Jkschlo/Longo_App/main/quizzes.png",
-            }}
-            style={styles.navIcon}
-          />
-          <Text style={styles.navText}>Quizzes</Text>
+        <TouchableOpacity
+          style={styles.navItem}
+          onPress={() => router.push("/badges")}
+        >
+          <Ionicons name="medal-outline" size={24} color="#000" />
+          <Text style={styles.navText}>Badges</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.navItem} onPress={safePush("/training")}>
+        <TouchableOpacity
+          style={styles.navItem}
+          onPress={safePush("/training")}
+        >
           <Image
             source={{
               uri: "https://github.com/Jkschlo/Longo_App/blob/main/training.JPG?raw=true",

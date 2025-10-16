@@ -171,7 +171,7 @@ export default function CreateLogin() {
       );
 
       // 4) Navigate to profile (server trigger creates DB row)
-      router.push("/profile");
+      router.push("./profile");
     } catch (err) {
       const msg = String(err?.message || "");
       if (/email not confirmed/i.test(msg)) {
@@ -318,7 +318,7 @@ export default function CreateLogin() {
                 Already have an account?{" "}
                 <Text
                   style={styles.linkUnderline}
-                  onPress={() => router.push("/login")}
+                  onPress={() => router.push("./login")}
                 >
                   Log In
                 </Text>

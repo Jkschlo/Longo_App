@@ -32,7 +32,7 @@ export default function DuctCleaning() {
       <ScrollView contentContainerStyle={{ paddingBottom: 120, paddingHorizontal: 16 }}>
         <View style={styles.section}>
           <Text style={styles.sectionText}>
-            Welcome to the equipment module!
+            Welcome to the Basic Process module!
           </Text>
         </View>
 

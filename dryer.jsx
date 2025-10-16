@@ -10,7 +10,7 @@ import {
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 
-export default function DuctCleaning() {
+export default function DryerExhaust() {
   const router = useRouter();
 
   return (
@@ -32,7 +32,7 @@ export default function DuctCleaning() {
       <ScrollView contentContainerStyle={{ paddingBottom: 120, paddingHorizontal: 16 }}>
         <View style={styles.section}>
           <Text style={styles.sectionText}>
-            Welcome to the equipment module!
+            Welcome to the Dryer module!
           </Text>
         </View>
 
